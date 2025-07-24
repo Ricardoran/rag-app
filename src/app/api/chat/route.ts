@@ -23,9 +23,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
+    const responses = await openai.responses.create({
+      model: 'gpt-4.1',
+      tools: [ { type: "web_search_preview" } ],
+      input: [
         {
           role: 'system',
           content: 'You are a helpful AI assistant that provides informative responses. When answering questions, structure your response clearly and mention if you would typically need to search through documents or a knowledge base to provide more specific information.'
@@ -35,11 +36,9 @@ export async function POST(request: NextRequest) {
           content: query
         }
       ],
-      max_tokens: 1000,
       temperature: 0.7,
     });
-
-    const response = completion.choices[0]?.message?.content || 'No response generated';
+    const response = responses.output_text || 'No response generated';
     
     // Mock sources for demonstration - in a real RAG system, these would come from your knowledge base
     const mockSources = [
